@@ -76,7 +76,7 @@ require_once 'creditos/procesamiento.php';
             <div class="col-md-10">
                 <div class="card shadow p-4">
                     <h2 class="mb-2">4. Prestamos de libros</h2>
-                    <p class="text-muted">Este módulo incluye validaciones para asegurar que los correos electrónicos sean únicos y válidos, además de restricciones para evitar la actualización de registros de alumnos que ya se han graduado.</p>
+                    <p class="text-muted">Este módulo valida que no se puedan realizar préstamos si no hay ejemplares disponibles y reduce la cantidad de libros al registrar un préstamo exitoso.</p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <a href="prestamos/prestamos.php" class="btn btn-primary me-md-2 rounded">Prestamos de libros</a>
                     </div>

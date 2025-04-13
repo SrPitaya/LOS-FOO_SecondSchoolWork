@@ -1,3 +1,41 @@
+<?php
+require_once __DIR__ . '/../config/conexion.php';
+
+// Obtener parámetros de filtrado
+$tabla_filtro = $_GET['tabla'] ?? '';
+$accion_filtro = $_GET['accion'] ?? '';
+$pagina = isset($_GET['pagina']) ? max(1, intval($_GET['pagina'])) : 1;
+$por_pagina = 10;
+
+// Construir consulta base con conteo total
+$query = "SELECT * FROM logs WHERE 1=1";
+$query_count = "SELECT COUNT(*) AS total FROM logs WHERE 1=1";
+
+// Aplicar filtros
+if (!empty($tabla_filtro)) {
+    $query .= " AND tabla_afectada = '$tabla_filtro'";
+    $query_count .= " AND tabla_afectada = '$tabla_filtro'";
+}
+if (!empty($accion_filtro)) {
+    $query .= " AND accion = '$accion_filtro'";
+    $query_count .= " AND accion = '$accion_filtro'";
+}
+
+// Obtener total de registros
+$total_resultados = $conn->query($query_count)->fetch_assoc()['total'];
+$total_paginas = ceil($total_resultados / $por_pagina);
+
+// Aplicar paginación
+$offset = ($pagina - 1) * $por_pagina;
+$query .= " ORDER BY fecha_creacion DESC LIMIT $offset, $por_pagina";
+
+// Ejecutar consulta
+$logs = $conn->query($query);
+
+// Obtener tablas únicas para el filtro
+$tablas = $conn->query("SELECT DISTINCT tabla_afectada FROM logs ORDER BY tabla_afectada");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -14,6 +52,15 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="../css/styles.css" rel="stylesheet" />
+        <style>
+            .badge-insert { background-color: #28a745; }
+            .badge-update { background-color: #ffc107; color: #212529; }
+            .badge-delete { background-color: #dc3545; }
+            .log-card { transition: all 0.3s; }
+            .log-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+            .filter-section { background-color: #f8f9fa; border-radius: 5px; }
+            .pagination .page-item.active .page-link { background-color: #6c757d; border-color: #6c757d; }
+        </style>
     </head>
     <body>
         <!-- Navigation-->
@@ -42,30 +89,168 @@
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="site-heading">
                             <h1>AUDITORIAS</h1>
-                            <span class="subheading">Practica para Programación avanzada de base de datos</span>
+                            <span class="subheading">Registro de cambios en el sistema</span>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
         <!-- Main Content-->
-        <div class="container px-4 px-lg-5">
+        <div class="container px-4 px-lg-5 py-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-md-10 col-lg-8 col-xl-7">
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="post.html">
-                            <h2 class="post-title">Man must explore, and this is exploration at its greatest</h2>
-                            <h3 class="post-subtitle">Problems look mighty small from 150 miles up</h3>
-                        </a>
-                        <p class="post-meta">
-                            Posted by
-                            <a href="#!">Start Bootstrap</a>
-                            on September 24, 2023
-                        </p>
+                <div class="col-lg-10">
+                    <!-- Filtros -->
+                    <div class="card mb-4 filter-section">
+                        <div class="card-body">
+                            <h5 class="card-title">Filtrar registros</h5>
+                            <form method="get" class="row g-3">
+                                <div class="col-md-5">
+                                    <label for="tabla" class="form-label">Tabla afectada</label>
+                                    <select id="tabla" name="tabla" class="form-select">
+                                        <option value="">Todas las tablas</option>
+                                        <?php while ($tabla = $tablas->fetch_assoc()): ?>
+                                            <option value="<?= $tabla['tabla_afectada'] ?>" <?= $tabla['tabla_afectada'] == $tabla_filtro ? 'selected' : '' ?>>
+                                                <?= ucfirst($tabla['tabla_afectada']) ?>
+                                            </option>
+                                        <?php endwhile; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <label for="accion" class="form-label">Acción</label>
+                                    <select id="accion" name="accion" class="form-select">
+                                        <option value="">Todas las acciones</option>
+                                        <option value="INSERT" <?= $accion_filtro == 'INSERT' ? 'selected' : '' ?>>Creaciones (INSERT)</option>
+                                        <option value="UPDATE" <?= $accion_filtro == 'UPDATE' ? 'selected' : '' ?>>Actualizaciones (UPDATE)</option>
+                                        <option value="DELETE" <?= $accion_filtro == 'DELETE' ? 'selected' : '' ?>>Eliminaciones (DELETE)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
+
+                    <!-- Resumen -->
+                    <div class="alert alert-info mb-4">
+                        Mostrando <?= ($offset + 1) ?> a <?= min($offset + $por_pagina, $total_resultados) ?> de <?= $total_resultados ?> registros
+                    </div>
+
+                    <!-- Lista de logs -->
+                    <?php if ($logs->num_rows > 0): ?>
+                        <?php while ($log = $logs->fetch_assoc()): ?>
+                            <div class="card mb-3 log-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-title">
+                                            <?= ucfirst($log['tabla_afectada']) ?> #<?= $log['registro_id'] ?>
+                                        </h5>
+                                        <span class="badge <?= $log['accion'] == 'INSERT' ? 'badge-insert' : ($log['accion'] == 'UPDATE' ? 'badge-update' : 'badge-delete') ?>">
+                                            <?= $log['accion'] ?>
+                                        </span>
+                                    </div>
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        <?= $log['nombre_completo'] ?>
+                                    </h6>
+                                    <p class="card-text"><?= $log['detalles'] ?></p>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">
+                                            <?= date('d/m/Y H:i:s', strtotime($log['fecha_creacion'])) ?>
+                                        </small>
+                                        <small>
+                                            <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#logDetailsModal<?= $log['log_id'] ?>">
+                                                Ver detalles
+                                            </a>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal para detalles completos -->
+                            <div class="modal fade" id="logDetailsModal<?= $log['log_id'] ?>" tabindex="-1" aria-labelledby="logDetailsModalLabel<?= $log['log_id'] ?>" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="logDetailsModalLabel<?= $log['log_id'] ?>">
+                                                Detalles del registro de auditoría
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <strong>ID del Log:</strong>
+                                                    <p><?= $log['log_id'] ?></p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>Tabla afectada:</strong>
+                                                    <p><?= ucfirst($log['tabla_afectada']) ?></p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>ID del Registro:</strong>
+                                                    <p><?= $log['registro_id'] ?></p>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <strong>Usuario:</strong>
+                                                    <p><?= $log['nombre_completo'] ?></p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>Acción:</strong>
+                                                    <p>
+                                                        <span class="badge <?= $log['accion'] == 'INSERT' ? 'badge-insert' : ($log['accion'] == 'UPDATE' ? 'badge-update' : 'badge-delete') ?>">
+                                                            <?= $log['accion'] ?>
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong>Fecha y hora:</strong>
+                                                <p><?= date('d/m/Y H:i:s', strtotime($log['fecha_creacion'])) ?></p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong>Detalles:</strong>
+                                                <div class="p-3 bg-light rounded">
+                                                    <?= $log['detalles'] ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div class="alert alert-warning">No se encontraron registros de auditoría con los filtros seleccionados.</div>
+                    <?php endif; ?>
+
+                    <!-- Paginación -->
+                    <?php if ($total_paginas > 1): ?>
+                        <nav aria-label="Paginación de logs">
+                            <ul class="pagination justify-content-center mt-4">
+                                <?php if ($pagina > 1): ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?pagina=<?= $pagina-1 ?>&tabla=<?= $tabla_filtro ?>&accion=<?= $accion_filtro ?>">Anterior</a>
+                                    </li>
+                                <?php endif; ?>
+
+                                <?php for ($i = 1; $i <= $total_paginas; $i++): ?>
+                                    <li class="page-item <?= $i == $pagina ? 'active' : '' ?>">
+                                        <a class="page-link" href="?pagina=<?= $i ?>&tabla=<?= $tabla_filtro ?>&accion=<?= $accion_filtro ?>"><?= $i ?></a>
+                                    </li>
+                                <?php endfor; ?>
+
+                                <?php if ($pagina < $total_paginas): ?>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?pagina=<?= $pagina+1 ?>&tabla=<?= $tabla_filtro ?>&accion=<?= $accion_filtro ?>">Siguiente</a>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </nav>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
