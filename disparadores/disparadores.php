@@ -63,11 +63,22 @@ require_once 'creditos/procesamiento.php';
         <div class="row justify-content-center mt-5">
             <div class="col-md-10">
                 <div class="card shadow p-4">
-                    <h2 class="mb-2">2-3. Cruds profesores y estudiantes</h2>
+                    <h2 class="mb-2">2-3. Gestion de profesores y estudiantes</h2>
                     <p class="text-muted">Este módulo incluye validaciones para asegurar que los correos electrónicos sean únicos y válidos, además de restricciones para evitar la actualización de registros de alumnos que ya se han graduado.</p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <a href="estudiantes_profesores/estudiantes.php" class="btn btn-primary me-md-2 rounded">CRUD Estudiantes</a>
                         <a href="estudiantes_profesores/profesores.php" class="btn btn-primary rounded">CRUD Profesores</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-10">
+                <div class="card shadow p-4">
+                    <h2 class="mb-2">4. Prestamos de libros</h2>
+                    <p class="text-muted">Este módulo incluye validaciones para asegurar que los correos electrónicos sean únicos y válidos, además de restricciones para evitar la actualización de registros de alumnos que ya se han graduado.</p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="prestamos/prestamos.php" class="btn btn-primary me-md-2 rounded">Prestamos de libros</a>
                     </div>
                 </div>
             </div>
