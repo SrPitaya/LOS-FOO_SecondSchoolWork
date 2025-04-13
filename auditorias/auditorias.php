@@ -53,9 +53,9 @@ $tablas = $conn->query("SELECT DISTINCT tabla_afectada FROM logs ORDER BY tabla_
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="../css/styles.css" rel="stylesheet" />
         <style>
-            .badge-insert { background-color: #28a745; }
-            .badge-update { background-color: #ffc107; color: #212529; }
-            .badge-delete { background-color: #dc3545; }
+            .badge-insert { background-color: #28a745; border-radius: 0.25rem; }
+            .badge-update { background-color: #ffc107; color: #212529; border-radius: 0.25rem; }
+            .badge-delete { background-color: #dc3545; border-radius: 0.25rem; }
             .log-card { transition: all 0.3s; }
             .log-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
             .filter-section { background-color: #f8f9fa; border-radius: 5px; }
@@ -125,14 +125,14 @@ $tablas = $conn->query("SELECT DISTINCT tabla_afectada FROM logs ORDER BY tabla_
                                     </select>
                                 </div>
                                 <div class="col-md-2 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                                    <button type="submit" class="btn btn-primary w-100 rounded">Filtrar</button>
                                 </div>
                             </form>
                         </div>
                     </div>
 
                     <!-- Resumen -->
-                    <div class="alert alert-info mb-4">
+                    <div class="alert alert-info mb-4 rounded">
                         Mostrando <?= ($offset + 1) ?> a <?= min($offset + $por_pagina, $total_resultados) ?> de <?= $total_resultados ?> registros
                     </div>
 
@@ -177,47 +177,24 @@ $tablas = $conn->query("SELECT DISTINCT tabla_afectada FROM logs ORDER BY tabla_
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="row mb-3">
-                                                <div class="col-md-4">
-                                                    <strong>ID del Log:</strong>
-                                                    <p><?= $log['log_id'] ?></p>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <strong>Tabla afectada:</strong>
-                                                    <p><?= ucfirst($log['tabla_afectada']) ?></p>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <strong>ID del Registro:</strong>
-                                                    <p><?= $log['registro_id'] ?></p>
-                                                </div>
-                                            </div>
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <strong>Usuario:</strong>
-                                                    <p><?= $log['nombre_completo'] ?></p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <strong>Acción:</strong>
-                                                    <p>
-                                                        <span class="badge <?= $log['accion'] == 'INSERT' ? 'badge-insert' : ($log['accion'] == 'UPDATE' ? 'badge-update' : 'badge-delete') ?>">
-                                                            <?= $log['accion'] ?>
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <strong>Fecha y hora:</strong>
-                                                <p><?= date('d/m/Y H:i:s', strtotime($log['fecha_creacion'])) ?></p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <strong>Detalles:</strong>
-                                                <div class="p-3 bg-light rounded">
-                                                    <?= $log['detalles'] ?>
-                                                </div>
-                                            </div>
+                                            <ul class="list-group">
+                                                <li class="list-group-item"><strong>ID del Log:</strong> <?= $log['log_id'] ?></li>
+                                                <li class="list-group-item"><strong>Tabla afectada:</strong> <?= ucfirst($log['tabla_afectada']) ?></li>
+                                                <li class="list-group-item"><strong>ID del Registro:</strong> <?= $log['registro_id'] ?></li>
+                                                <li class="list-group-item"><strong>Usuario:</strong> <?= $log['nombre_completo'] ?></li>
+                                                <li class="list-group-item"><strong>Acción:</strong> 
+                                                    <span class="badge <?= $log['accion'] == 'INSERT' ? 'badge-insert' : ($log['accion'] == 'UPDATE' ? 'badge-update' : 'badge-delete') ?>">
+                                                        <?= $log['accion'] ?>
+                                                    </span>
+                                                </li>
+                                                <li class="list-group-item"><strong>Fecha y hora:</strong> <?= date('d/m/Y H:i:s', strtotime($log['fecha_creacion'])) ?></li>
+                                                <li class="list-group-item"><strong>Detalles:</strong> 
+                                                    <div class="p-3 bg-light rounded"><?= $log['detalles'] ?></div>
+                                                </li>
+                                            </ul>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                            <button type="button" class="btn btn-secondary rounded" data-bs-dismiss="modal">Cerrar</button>
                                         </div>
                                     </div>
                                 </div>
