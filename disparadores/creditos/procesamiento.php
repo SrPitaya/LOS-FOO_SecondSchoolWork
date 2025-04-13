@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../conexion.php';
+require_once __DIR__ . '/../../config/conexion.php';
 
 $estudiantes = $conn->query("SELECT estudiante_id, CONCAT(nombre, ' ', apellido) AS nombre_completo FROM estudiantes");
 $cursos = $conn->query("SELECT curso_id, nombre FROM cursos");
