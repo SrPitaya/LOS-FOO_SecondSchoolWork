@@ -1,3 +1,27 @@
+<?php
+require_once __DIR__ . '/../config/conexion.php'; // Asegúrate de incluir tu archivo de conexión
+
+$message = "";
+
+// Procesar la ejecución de un procedimiento almacenado
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['ejecutar_procedimiento'])) {
+    $procedimiento = $_POST['procedimiento'];
+    $parametros = $_POST['parametros'];
+
+    try {
+        // Preparar la llamada al procedimiento
+        $stmt = $conn->prepare("CALL $procedimiento($parametros)");
+        $stmt->execute();
+        $message = "Procedimiento ejecutado con éxito.";
+    } catch (mysqli_sql_exception $e) {
+        $message = "Error al ejecutar el procedimiento: " . $e->getMessage();
+    }
+}
+
+// Obtener la lista de procedimientos almacenados
+$procedimientos = $conn->query("SHOW PROCEDURE STATUS WHERE Db = 'universidad_db2'");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -5,7 +29,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Rutinas</title>
+        <title>Procedimientos Almacenados</title>
         <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
         <!-- Font Awesome icons (free version)-->
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -27,7 +51,7 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto py-4 py-lg-0">
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../index.php">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="rutinas.php">Rutinas</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="procedimientos.php">Procedimientos</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../subconsultas/subconsultas.php">Subconsultas</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../disparadores/disparadores.php">Disparadores</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="../auditorias/auditorias.php">Auditorias</a></li>
@@ -41,34 +65,42 @@
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="site-heading">
-                            <h1>RUTINAS</h1>
-                            <span class="subheading">Practica para Programación avanzada de base de datos</span>
+                            <h1>Procedimientos Almacenados</h1>
+                            <span class="subheading">Gestión de Procedimientos desde la Web</span>
                         </div>
                     </div>
                 </div>
             </div>
         </header>
         <!-- Main Content-->
-        <div class="container px-4 px-lg-5">
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-md-10 col-lg-8 col-xl-7">
-                    <!-- Post preview-->
-                    <div class="post-preview">
-                        <a href="post.html">
-                            <h2 class="post-title">Man must explore, and this is exploration at its greatest</h2>
-                            <h3 class="post-subtitle">Problems look mighty small from 150 miles up</h3>
-                        </a>
-                        <p class="post-meta">
-                            Posted by
-                            <a href="#!">Start Bootstrap</a>
-                            on September 24, 2023
-                        </p>
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <?php if (!empty($message)): ?>
+                        <div class="alert alert-info"><?= $message ?></div>
+                    <?php endif; ?>
+
+                    <div class="card shadow p-4">
+                        <h2 class="mb-4">Gestión de Procedimientos Almacenados</h2>
+                        <ul>
+                            <li><a href="PA/inscribir_curso.php">Inscribir Curso</a></li>
+                            <li><a href="PA/registrar_estudiante.php">Registrar Estudiante</a></li>
+                            <li><a href="PA/registrar_pago.php">Registrar Pago</a></li>
+                            <li><a href="PA/resgistrar_prestamo.php">Registrar Préstamo</a></li>
+                            <li><a href="PA/registrar_profesor.php">Registrar Profesor</a></li>
+                        </ul>
                     </div>
-                    <!-- Divider-->
-                    <hr class="my-4" />
                 </div>
             </div>
         </div>
+
+        <script>
+            function setParametros(procedimiento) {
+                const parametros = document.getElementById(`parametros_${procedimiento}`).value;
+                document.getElementById(`parametros_input_${procedimiento}`).value = parametros;
+            }
+        </script>
+
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->

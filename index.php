@@ -27,11 +27,12 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto py-4 py-lg-0">
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="index.php">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="rutinas/rutinas.php">Rutinas</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="Procedimientos/Procedimientos.php">Procedimientos</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="subconsultas/subconsultas.php">Subconsultas</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="disparadores/disparadores.php">Disparadores</a></li>
                         <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="auditorias/auditorias.php">Auditorias</a></li>
                     </ul>
+                    
                 </div>
             </div>
         </nav>
@@ -58,7 +59,9 @@
                             <h2 class="post-title">Quienes somos LOS FOO 🤡?</h2>
                             <h4 class="post-subtitle">Axel isai Mis Aguilar</h4>
                             <img src="https://randomuser.me/api/portraits/men/25.jpg" alt="Random User" class="rounded" style="width: 150px; height: 150px; object-fit: cover; margin-top: 15px;">
-                                
+                            <hr>
+                            <h4 class="post-subtitle">Jesus Emmanuel Tuz May</h4>
+                            <img src="https://randomuser.me/api/portraits/men/30.jpg" alt="Random User" class="rounded" style="width: 150px; height: 150px; object-fit: cover; margin-top: 15px;">
                         <p class="post-meta">
                             Posted by
                             <a href="#!">LOS FOO 🤡</a>
